@@ -7,10 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
+        [x-cloak] { display: none !important; }
+        
         /* GLASS EDITION */
         .theme-glass { background: linear-gradient(135deg, #e0e7ff, #f3f4f6); color: #1e293b; }
         .theme-glass .sidebar { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.3); }
-        .theme-glass .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); shadow: 0 8px 32px rgba(31, 38, 135, 0.1); }
+        .theme-glass .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
         .theme-glass .btn-active { background: rgba(79, 70, 229, 0.1); border-left: 4px solid #4f46e5; }
 
         /* CYBERPUNK EDITION */
@@ -33,23 +35,53 @@
         showModal: false,
         formData: {},
         config: { projectName: 'Loading...', modules: [], theme: 'glass' },
+
         async init() {
-            try {
-                this.config = await (await fetch('./config.json')).json();
-            } catch (e) {
-                console.error('Sila pastikan fail config.json wujud.');
+            // 1. Cuba ambil data dari LocalStorage dulu
+            const savedData = localStorage.getItem('ketick_os_config');
+            
+            if (savedData) {
+                this.config = JSON.parse(savedData);
+            } else {
+                // 2. Jika tiada, baru ambil dari fail config.json
+                try {
+                    const response = await fetch('./config.json');
+                    this.config = await response.json();
+                    this.saveToLocal(); // Simpan salinan pertama ke LocalStorage
+                } catch (e) {
+                    console.error('Sila pastikan fail config.json wujud.');
+                }
             }
         },
+
+        saveToLocal() {
+            // Simpan seluruh konfigurasi dan data ke memori pelayar
+            localStorage.setItem('ketick_os_config', JSON.stringify(this.config));
+        },
+
         openAddModal() {
             this.formData = {}; 
             this.showModal = true;
         },
+
         saveData() {
             const currentModule = this.config.modules.find(m => m.id === this.activeTab);
             if(currentModule && currentModule.data) {
+                // Tambah data baru ke dalam array
                 currentModule.data.push({...this.formData});
+                
+                // KEMASKINI STORAN
+                this.saveToLocal();
             }
             this.showModal = false;
+        },
+
+        deleteData(index) {
+            if(confirm('Adakah anda pasti mahu memadam rekod ini?')) {
+                const currentModule = this.config.modules.find(m => m.id === this.activeTab);
+                currentModule.data.splice(index, 1);
+                this.saveToLocal(); // Kemaskini storan selepas padam
+            }
         }
       }">
 
@@ -111,19 +143,24 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <template x-for="row in config.modules?.find(m => m.id === activeTab)?.data">
+                                    <template x-for="(row, index) in config.modules?.find(m => m.id === activeTab)?.data">
                                         <tr class="border-b border-gray-700 border-opacity-10 hover:bg-white hover:bg-opacity-5 transition-colors">
                                             <template x-for="field in config.modules?.find(m => m.id === activeTab)?.fields">
                                                 <td class="p-4 text-sm" x-text="row[field]"></td>
                                             </template>
                                             <td class="p-4 text-center space-x-2">
                                                 <button class="text-blue-400 text-xs font-bold hover:underline">EDIT</button>
-                                                <button class="text-red-500 text-xs font-bold hover:underline">PADAM</button>
+                                                <button @click="deleteData(index)" class="text-red-500 text-xs font-bold hover:underline tracking-widest">
+                                                    PADAM
+                                                </button>
                                             </td>
                                         </tr>
                                     </template>
                                 </tbody>
                             </table>
+                        </div>
+                        <div x-show="!config.modules?.find(m => m.id === activeTab)?.data || config.modules?.find(m => m.id === activeTab)?.data.length === 0" class="p-10 text-center opacity-40 italic">
+                            Tiada data tersedia.
                         </div>
                     </div>
                 </template>
