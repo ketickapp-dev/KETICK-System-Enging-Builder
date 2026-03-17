@@ -1,0 +1,30 @@
+{
+  "projectName": "KETICK OS",
+  "themeColor": "indigo",
+  "modules": [
+    {
+      "id": "dashboard",
+      "title": "Dashboard",
+      "icon": "📊",
+      "type": "stats_grid"
+    },
+    {
+      "id": "produk",
+      "title": "Pengurusan Stok",
+      "icon": "📦",
+      "type": "datatable"
+    },
+    {
+      "id": "pesanan",
+      "title": "Pesanan Masuk",
+      "icon": "🛒",
+      "type": "datatable"
+    },
+    {
+      "id": "tetapan",
+      "title": "Konfigurasi",
+      "icon": "⚙️",
+      "type": "form"
+    }
+  ]
+}
