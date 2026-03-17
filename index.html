@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Builder Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-100" x-data="{ sidebarOpen: true, activeTab: 'dashboard' }">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside :class="sidebarOpen ? 'w-64' : 'w-20'" class="bg-indigo-900 text-white transition-all duration-300 flex flex-col">
+            <div class="p-4 font-bold text-xl border-b border-indigo-800 flex justify-between items-center">
+                <span x-show="sidebarOpen">SYS-GEN</span>
+                <button @click="sidebarOpen = !sidebarOpen" class="p-1 hover:bg-indigo-700 rounded">
+                    ☰
+                </button>
+            </div>
+            
+            <nav class="mt-4 flex-1">
+                <template x-for="item in ['dashboard', 'produk', 'pesanan', 'tetapan']">
+                    <button @click="activeTab = item" 
+                        :class="activeTab === item ? 'bg-indigo-700 border-l-4 border-yellow-400' : 'hover:bg-indigo-800'"
+                        class="w-full flex items-center p-4 transition-colors capitalize">
+                        <span class="ml-2" x-show="sidebarOpen" x-text="item"></span>
+                    </button>
+                </template>
+            </nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto">
+            <header class="bg-white shadow p-4 flex justify-between items-center">
+                <h2 class="text-xl font-semibold capitalize" x-text="activeTab"></h2>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500">Admin Mode</span>
+                    <div class="w-8 h-8 bg-indigo-500 rounded-full"></div>
+                </div>
+            </header>
+
+            <div class="p-6">
+                <div x-show="activeTab === 'dashboard'" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-green-500">
+                        <p class="text-gray-500 text-sm font-bold uppercase">Jumlah Jualan</p>
+                        <p class="text-2xl font-bold">RM 15,200</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-blue-500">
+                        <p class="text-gray-500 text-sm font-bold uppercase">Stok Rendah</p>
+                        <p class="text-2xl font-bold">12 Item</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-purple-500">
+                        <p class="text-gray-500 text-sm font-bold uppercase">Pesanan Baru</p>
+                        <p class="text-2xl font-bold">5</p>
+                    </div>
+                </div>
+
+                <div x-show="activeTab !== 'dashboard'" class="bg-white p-10 rounded shadow text-center text-gray-400">
+                    Modul <span x-text="activeTab"></span> akan dijana secara automatik di sini.
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
