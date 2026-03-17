@@ -1,6 +1,6 @@
 {
   "projectName": "KETICK OS",
-  "theme": "cyberpunk",
+  "theme": "flux",
   "modules": [
     {
       "id": "dashboard",
