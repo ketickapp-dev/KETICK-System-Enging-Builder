@@ -1,6 +1,6 @@
 {
   "projectName": "KETICK OS",
-  "themeColor": "indigo",
+  "theme": "cyberpunk",
   "modules": [
     {
       "id": "dashboard",
@@ -12,13 +12,23 @@
       "id": "produk",
       "title": "Pengurusan Stok",
       "icon": "📦",
-      "type": "datatable"
+      "type": "datatable",
+      "fields": ["ID", "Nama Produk", "Harga", "Stok"],
+      "data": [
+        {"ID": "P001", "Nama Produk": "Mouse Gaming", "Harga": "RM 150", "Stok": 25},
+        {"ID": "P002", "Nama Produk": "Keyboard Mechanical", "Harga": "RM 350", "Stok": 10}
+      ]
     },
     {
       "id": "pesanan",
       "title": "Pesanan Masuk",
       "icon": "🛒",
-      "type": "datatable"
+      "type": "datatable",
+      "fields": ["No. Pesanan", "Pelanggan", "Status", "Jumlah"],
+      "data": [
+        {"No. Pesanan": "ORD-001", "Pelanggan": "Ali", "Status": "Selesai", "Jumlah": "RM 450"},
+        {"No. Pesanan": "ORD-002", "Pelanggan": "Abu", "Status": "Proses", "Jumlah": "RM 120"}
+      ]
     },
     {
       "id": "tetapan",
