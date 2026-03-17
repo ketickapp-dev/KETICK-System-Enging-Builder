@@ -14,6 +14,12 @@
       "icon": "📦",
       "type": "datatable",
       "fields": ["ID", "Nama Produk", "Harga", "Stok"],
+      "schema": [
+        {"name": "ID", "type": "text", "placeholder": "P00x"},
+        {"name": "Nama Produk", "type": "text", "placeholder": "Masukkan nama..."},
+        {"name": "Harga", "type": "text", "placeholder": "RM 0.00"},
+        {"name": "Stok", "type": "number", "placeholder": "0"}
+      ],
       "data": [
         {"ID": "P001", "Nama Produk": "Mouse Gaming", "Harga": "RM 150", "Stok": 25},
         {"ID": "P002", "Nama Produk": "Keyboard Mechanical", "Harga": "RM 350", "Stok": 10}
@@ -25,6 +31,12 @@
       "icon": "🛒",
       "type": "datatable",
       "fields": ["No. Pesanan", "Pelanggan", "Status", "Jumlah"],
+      "schema": [
+        {"name": "No. Pesanan", "type": "text", "placeholder": "ORD-xxx"},
+        {"name": "Pelanggan", "type": "text", "placeholder": "Nama pelanggan..."},
+        {"name": "Status", "type": "text", "placeholder": "Proses/Selesai"},
+        {"name": "Jumlah", "type": "text", "placeholder": "RM 0.00"}
+      ],
       "data": [
         {"No. Pesanan": "ORD-001", "Pelanggan": "Ali", "Status": "Selesai", "Jumlah": "RM 450"},
         {"No. Pesanan": "ORD-002", "Pelanggan": "Abu", "Status": "Proses", "Jumlah": "RM 120"}
