@@ -7,57 +7,80 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-100" x-data="{ sidebarOpen: true, activeTab: 'dashboard' }">
+<body class="bg-gray-100" 
+      x-data="{ 
+        sidebarOpen: true, 
+        activeTab: 'dashboard',
+        config: { projectName: 'Loading...', modules: [] },
+        async init() {
+            try {
+                // Mengambil data dari config.json
+                this.config = await (await fetch('./config.json')).json();
+            } catch (e) {
+                console.error('Gagal membaca config.json. Pastikan fail tersebut wujud.');
+            }
+        }
+      }">
 
     <div class="flex h-screen overflow-hidden">
         
         <aside :class="sidebarOpen ? 'w-64' : 'w-20'" class="bg-indigo-900 text-white transition-all duration-300 flex flex-col">
-            <div class="p-4 font-bold text-xl border-b border-indigo-800 flex justify-between items-center">
-                <span x-show="sidebarOpen">SYS-GEN</span>
-                <button @click="sidebarOpen = !sidebarOpen" class="p-1 hover:bg-indigo-700 rounded">
+            <div class="p-4 font-bold text-xl border-b border-indigo-800 flex justify-between items-center whitespace-nowrap overflow-hidden">
+                <span x-show="sidebarOpen" x-text="config.projectName"></span>
+                <button @click="sidebarOpen = !sidebarOpen" class="p-2 hover:bg-indigo-700 rounded transition-colors">
                     ☰
                 </button>
             </div>
             
-            <nav class="mt-4 flex-1">
-                <template x-for="item in ['dashboard', 'produk', 'pesanan', 'tetapan']">
-                    <button @click="activeTab = item" 
-                        :class="activeTab === item ? 'bg-indigo-700 border-l-4 border-yellow-400' : 'hover:bg-indigo-800'"
-                        class="w-full flex items-center p-4 transition-colors capitalize">
-                        <span class="ml-2" x-show="sidebarOpen" x-text="item"></span>
+            <nav class="mt-4 flex-1 overflow-y-auto">
+                <template x-for="modul in config.modules" :key="modul.id">
+                    <button @click="activeTab = modul.id" 
+                        :class="activeTab === modul.id ? 'bg-indigo-700 border-l-4 border-yellow-400' : 'hover:bg-indigo-800'"
+                        class="w-full flex items-center p-4 transition-all duration-200">
+                        <span class="text-xl" x-text="modul.icon"></span>
+                        <span class="ml-4 font-medium" x-show="sidebarOpen" x-text="modul.title"></span>
                     </button>
                 </template>
             </nav>
         </aside>
 
-        <main class="flex-1 overflow-y-auto">
-            <header class="bg-white shadow p-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold capitalize" x-text="activeTab"></h2>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500">Admin Mode</span>
-                    <div class="w-8 h-8 bg-indigo-500 rounded-full"></div>
+        <main class="flex-1 overflow-y-auto flex flex-col">
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800 capitalize" x-text="config.modules?.find(m => m.id === activeTab)?.title || activeTab"></h2>
+                <div class="flex items-center space-x-3">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-bold text-indigo-600">Admin Panel</p>
+                        <p class="text-[10px] text-gray-400">v1.0-Automated</p>
+                    </div>
+                    <div class="w-10 h-10 bg-indigo-100 border border-indigo-200 rounded-full flex items-center justify-center text-indigo-700 font-bold text-sm">
+                        AD
+                    </div>
                 </div>
             </header>
 
             <div class="p-6">
-                <div x-show="activeTab === 'dashboard'" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-green-500">
-                        <p class="text-gray-500 text-sm font-bold uppercase">Jumlah Jualan</p>
-                        <p class="text-2xl font-bold">RM 15,200</p>
+                
+                <template x-if="config.modules?.find(m => m.id === activeTab)?.type === 'stats_grid'">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-indigo-500 hover:shadow-md transition-shadow">
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Status Enjin</p>
+                            <p class="text-2xl font-black text-gray-800 mt-1">Sedia Menjana</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-emerald-500 hover:shadow-md transition-shadow">
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Modul Aktif</p>
+                            <p class="text-2xl font-black text-gray-800 mt-1" x-text="config.modules?.length"></p>
+                        </div>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-blue-500">
-                        <p class="text-gray-500 text-sm font-bold uppercase">Stok Rendah</p>
-                        <p class="text-2xl font-bold">12 Item</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-sm border-t-4 border-purple-500">
-                        <p class="text-gray-500 text-sm font-bold uppercase">Pesanan Baru</p>
-                        <p class="text-2xl font-bold">5</p>
-                    </div>
-                </div>
+                </template>
 
-                <div x-show="activeTab !== 'dashboard'" class="bg-white p-10 rounded shadow text-center text-gray-400">
-                    Modul <span x-text="activeTab"></span> akan dijana secara automatik di sini.
-                </div>
+                <template x-if="config.modules?.find(m => m.id === activeTab)?.type !== 'stats_grid'">
+                    <div class="bg-white border-2 border-dashed border-gray-200 p-20 rounded-2xl text-center">
+                        <div class="text-5xl mb-4" x-text="config.modules?.find(m => m.id === activeTab)?.icon"></div>
+                        <h3 class="text-lg font-bold text-gray-700">Modul <span x-text="activeTab"></span></h3>
+                        <p class="text-gray-400 mt-2">Fungsi <span class="px-2 py-1 bg-gray-100 rounded text-indigo-600 font-mono text-sm" x-text="config.modules?.find(m => m.id === activeTab)?.type"></span> akan dijana secara automatik dalam fasa seterusnya.</p>
+                    </div>
+                </template>
+
             </div>
         </main>
     </div>
