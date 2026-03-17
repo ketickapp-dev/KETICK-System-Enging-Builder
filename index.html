@@ -9,21 +9,20 @@
     <style>
         /* GLASS EDITION */
         .theme-glass { background: linear-gradient(135deg, #e0e7ff, #f3f4f6); color: #1e293b; }
-        .theme-glass .sidebar { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.3); color: #1e293b; }
-        .theme-glass .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1); }
+        .theme-glass .sidebar { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.3); }
+        .theme-glass .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); shadow: 0 8px 32px rgba(31, 38, 135, 0.1); }
         .theme-glass .btn-active { background: rgba(79, 70, 229, 0.1); border-left: 4px solid #4f46e5; }
 
         /* CYBERPUNK EDITION */
         .theme-cyberpunk { background: #0a0a12; color: #00ff41; font-family: 'Courier New', Courier, monospace; }
-        .theme-cyberpunk .sidebar { background: #0d0d17; border-right: 2px solid #ff003c; color: #00ff41; }
+        .theme-cyberpunk .sidebar { background: #0d0d17; border-right: 2px solid #ff003c; }
         .theme-cyberpunk .glass-card { background: #16213e; border: 1px solid #00fff9; box-shadow: 0 0 15px rgba(0, 255, 249, 0.3); color: white; }
         .theme-cyberpunk .btn-active { background: #1a1a2e; border-left: 4px solid #ff003c; color: #ff003c; text-shadow: 0 0 5px #ff003c; }
-        .theme-cyberpunk th { color: #ff003c; border-bottom: 1px solid #ff003c; }
 
         /* FLUX EDITION */
         .theme-flux { background: #0f172a; color: #f8fafc; }
         .theme-flux .sidebar { background: #1e293b; border-right: 1px solid #334155; }
-        .theme-flux .glass-card { background: #1e293b; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .theme-flux .glass-card { background: #1e293b; border: 1px solid #334155; }
         .theme-flux .btn-active { background: #334155; border-left: 4px solid #38bdf8; }
     </style>
 </head>
@@ -31,13 +30,26 @@
       x-data="{ 
         sidebarOpen: true, 
         activeTab: 'dashboard',
+        showModal: false,
+        formData: {},
         config: { projectName: 'Loading...', modules: [], theme: 'glass' },
         async init() {
             try {
                 this.config = await (await fetch('./config.json')).json();
             } catch (e) {
-                console.error('Sila pastikan fail config.json wujud dalam folder root.');
+                console.error('Sila pastikan fail config.json wujud.');
             }
+        },
+        openAddModal() {
+            this.formData = {}; 
+            this.showModal = true;
+        },
+        saveData() {
+            const currentModule = this.config.modules.find(m => m.id === this.activeTab);
+            if(currentModule && currentModule.data) {
+                currentModule.data.push({...this.formData});
+            }
+            this.showModal = false;
         }
       }">
 
@@ -64,19 +76,15 @@
         <main class="flex-1 overflow-y-auto flex flex-col relative">
             <header class="p-4 flex justify-between items-center border-b border-gray-700 bg-opacity-30 backdrop-blur-md sticky top-0 z-10">
                 <h2 class="text-xl font-bold capitalize" x-text="config.modules?.find(m => m.id === activeTab)?.title || activeTab"></h2>
-                <div class="flex items-center space-x-4">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-[10px] uppercase tracking-widest opacity-60">Engine Mode</p>
-                        <p class="text-xs font-mono" x-text="config.theme"></p>
-                    </div>
-                    <div class="w-10 h-10 rounded-full border border-gray-500 flex items-center justify-center font-bold bg-white bg-opacity-10">
-                        K
-                    </div>
-                </div>
+                
+                <template x-if="config.modules?.find(m => m.id === activeTab)?.type === 'datatable'">
+                    <button @click="openAddModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition-transform active:scale-95">
+                        + Tambah Rekod
+                    </button>
+                </template>
             </header>
 
             <div class="p-6">
-                
                 <template x-if="config.modules?.find(m => m.id === activeTab)?.type === 'stats_grid'">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="glass-card p-6 rounded-xl border-b-4 border-indigo-500">
@@ -117,22 +125,39 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div x-show="!config.modules?.find(m => m.id === activeTab)?.data" class="p-10 text-center opacity-40 italic">
-                            Tiada data tersedia untuk modul ini.
-                        </div>
                     </div>
                 </template>
 
                 <template x-if="['stats_grid', 'datatable'].indexOf(config.modules?.find(m => m.id === activeTab)?.type) === -1">
                     <div class="glass-card p-12 rounded-2xl text-center border-2 border-dashed border-gray-500 border-opacity-30">
                         <div class="text-6xl mb-4" x-text="config.modules?.find(m => m.id === activeTab)?.icon"></div>
-                        <h3 class="text-xl font-bold">Modul <span x-text="config.modules?.find(m => m.id === activeTab)?.title"></span></h3>
+                        <h3 class="text-xl font-bold" x-text="config.modules?.find(m => m.id === activeTab)?.title"></h3>
                         <p class="opacity-60 mt-2 italic">Fungsi penjanaan automatik bagi <span x-text="config.modules?.find(m => m.id === activeTab)?.type"></span> akan tersedia tidak lama lagi.</p>
                     </div>
                 </template>
-
             </div>
         </main>
     </div>
+
+    <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80 backdrop-blur-sm" x-transition x-cloak>
+        <div class="glass-card w-full max-w-md p-8 rounded-2xl shadow-2xl" @click.away="showModal = false">
+            <h3 class="text-2xl font-bold mb-6 flex items-center">
+                <span class="mr-2">📝</span> Tambah <span class="ml-1" x-text="activeTab"></span>
+            </h3>
+            <form @submit.prevent="saveData()" class="space-y-4">
+                <template x-for="field in config.modules?.find(m => m.id === activeTab)?.schema">
+                    <div>
+                        <label class="block text-xs font-bold uppercase mb-1 opacity-70" x-text="field.name"></label>
+                        <input :type="field.type" :placeholder="field.placeholder" x-model="formData[field.name]" class="w-full p-3 rounded-lg bg-black bg-opacity-20 border border-gray-600 focus:border-indigo-500 focus:outline-none transition-colors">
+                    </div>
+                </template>
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button type="button" @click="showModal = false" class="px-5 py-2 text-sm font-bold opacity-60 hover:opacity-100">BATAL</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg font-bold shadow-lg">SIMPAN</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>
